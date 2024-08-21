@@ -7,6 +7,7 @@ const initialState = {
     address: null,
     phoneNo: null,
     email: null,
+    adminImage: null
 }
 
 const adminSlice = createSlice({
@@ -20,6 +21,7 @@ const adminSlice = createSlice({
             state.address = action.payload.address;
             state.phoneNo = action.payload.phoneNo;
             state.email = action.payload.email;
+            state.adminImage = action.payload.adminImage;
         },
         setLogOutDetails: (state) => {
             state.id = null;
@@ -28,6 +30,7 @@ const adminSlice = createSlice({
             state.address = null;
             state.phoneNo = null;
             state.email = null;
+            state.adminImage = null;
         }
 
     }

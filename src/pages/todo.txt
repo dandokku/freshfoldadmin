@@ -1,0 +1,12 @@
+/// Routes
+
+<Route path="/">
+    <Route index element={<Home />}/>
+    <Route path="dashboard" element={<SharedLayout />}>
+        <Route index element={<Dashboard/>}/>
+        <Route path="/dashboard/users" element={<Dashboard/>}/>
+        <Route path="/dashboard/users" element={<Dashboard/>}/>
+        <Route path="/dashboard/users" element={<Dashboard/>}/>
+    </Route>
+    <Route path="login"element={<Login/>}/>
+</Route>
