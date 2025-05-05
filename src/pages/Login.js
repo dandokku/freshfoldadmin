@@ -16,7 +16,11 @@ export default function OldLogin() {
 
    async function postUser(fields){
     //NB So here i make a request to the server and past the data, after posting the data a jwt token is sent with the response as a header, so then i retrieve that header and store it in a local storage so that i can then make use of it in app.js and send it back to the server when trying to fetch data.
-        const response = await axios.post("http://localhost:9000/api/admin-auth", fields);
+        const response = await axios.post("http://localhost:9000/api/admin-auth", {
+  email: "kamidanokku1@gmail.com",
+  password: "kami1"
+});
+
         const authToken = response.headers['x-auth-admin-token'];
         localStorage.setItem("admin-jwt", JSON.stringify(authToken));
    }
@@ -130,11 +134,11 @@ export default function OldLogin() {
 }
 
 const primary = "#34347C";
-const secondary = "#E9B609";
+const secondary = "#34CCA1";
 // const bg = "#F4F4F4";
 const borderRad = "5px";
 const yellowBtnHover = "#f7cb39";
-const gray = "#545454";
+const gray = "#7A8C87";
 
 const Main = styled.main`
     background: linear-gradient(135deg, #fff 0%, #fff 55%, ${primary} 55%, ${secondary} 100%);
