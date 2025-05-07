@@ -1,260 +1,170 @@
 import React from "react";
+import {styled} from "styled-components"
 import { Link, NavLink, useMatch } from "react-router-dom";
-import styled from "styled-components";
-import {ImPriceTags} from "react-icons/im"
-import {FaHandsWash} from "react-icons/fa"
-import {MdLibraryBooks} from "react-icons/md"
-import {HiUsers} from "react-icons/hi"
-import {MdDashboard} from "react-icons/md"
+import { ImPriceTags } from "react-icons/im";
+import { FaHandsWash } from "react-icons/fa";
+import { MdLibraryBooks, MdDashboard } from "react-icons/md";
+import { HiUsers } from "react-icons/hi";
 import { FaSoap } from 'react-icons/fa';
 import { useSelector } from "react-redux";
-import adminImage from "../pages/assets/images/about2.jpg"
+import adminImage from "../pages/assets/images/about2.jpg";
 
-
-export default function Sidebar(props) {
-
-    const [darkTheme, setDarkTheme] = React.useState(false);
-
+export default function Sidebar({ sidebar }) {
     const admin = useSelector(state => state.admin);
 
-    function navLinkStyles({isActive}){
-        return {
-            color: isActive ? `#ffffff` : `#ffffff`, // editted
-            textDecoration: "none",
-            position: "relative",
-            letterSpacing: "1.6px",
-            fontSize: "0.9rem",
-            width: "100%",// ediitted
-            // fontWeight: headerActive ? `bolder` : ``,
-        }
-    }
+    const navLinkStyles = ({ isActive }) => ({
+        backgroundColor: isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+        color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.8)',
+        fontWeight: isActive ? '600' : '400'
+    });
 
     const matchProfile = useMatch('/dashboard');
     const matchUsers = useMatch('/dashboard/users/*');
     const matchBookings = useMatch('/dashboard/bookings/*');
     const matchPrices = useMatch('/dashboard/prices/*');
     const matchServices = useMatch('/dashboard/services/*');
-    // const matchManagement = useMatch('/profile/management');
-
 
     return (
-        <Container className={props.sidebar}>
-            <Link to='/' className="my-11">
-                <span className='logo text-whiteColor font-bold text-3xl flex items-center max-sm:text-xl'>Fresh <span className='text-whiteColor flex '>F <span><FaSoap className="text-whiteColor" size={30} /></span> ld</span> </span>
-            </Link>
+        <Container className={sidebar}>
+            {/* Logo Section */}
+            <LogoSection>
+                <Link to='/'>
+                    <span className='flex items-center text-2xl font-bold'>
+                        <span className="text-white">Fresh</span>
+                        <span className='flex text-white'>
+                            F <FaSoap className="mx-1" size={24} /> ld
+                        </span>
+                    </span>
+                </Link>
+            </LogoSection>
 
+            {/* Admin Profile */}
             <AdminProfile>
-                  <img src={adminImage} alt=""></img>
-                  <div>
-                    <h3>{admin.firstName} {admin.lastName}</h3>
-                    <p>{admin.email}</p>
-                  </div>
+                <img src={adminImage} alt="Admin" className="w-12 h-12 rounded-full object-cover" />
+                <div className="text-center">
+                    <h3 className="text-white font-medium">{admin.firstName} {admin.lastName}</h3>
+                    <p className="text-white text-opacity-70 text-sm">{admin.email}</p>
+                </div>
             </AdminProfile> 
-            <SideLinks>
-                {/* <Link to="/">Home</Link> */}
-                {/* <SideUl> */}
-                    <SideLink isActive={matchProfile} style={navLinkStyles} to="/dashboard">
-                        <MdDashboard size={25}/>
-                        <p>DashBoard</p>
-                    </SideLink>
-                {/* </SideUl> */}
 
-                {/* <SideUl> */}
-                    
-                    <SideLink isActive={matchUsers} style={navLinkStyles} to="/dashboard/users">
-                        <HiUsers size={25}/>
-                        <p>Users</p>
-                    </SideLink>
-                {/* </SideUl> */}
+            {/* Navigation Links */}
+            <NavLinks>
+                <NavItem isActive={matchProfile} to="/dashboard" style={navLinkStyles}>
+                    <MdDashboard size={20} className="flex-shrink-0" />
+                    <span>Dashboard</span>
+                </NavItem>
 
-                {/* <SideUl> */}
-                    
-                    <SideLink isActive={matchBookings} style={navLinkStyles} to="/dashboard/bookings">
-                        <MdLibraryBooks size={25}/>
-                        <p>Bookings</p>
-                    </SideLink>
-                {/* // </SideUl> */}
+                <NavItem isActive={matchUsers} to="/dashboard/users" style={navLinkStyles}>
+                    <HiUsers size={20} className="flex-shrink-0" />
+                    <span>Users</span>
+                </NavItem>
 
-                {/* <SideUl> */}
-                    
-                    <SideLink isActive={matchPrices} style={navLinkStyles} to="/dashboard/prices">
-                        <ImPriceTags size={25}/>
-                        <p>Prices</p>
-                    </SideLink>
-                {/* </SideUl> */}
+                <NavItem isActive={matchBookings} to="/dashboard/bookings" style={navLinkStyles}>
+                    <MdLibraryBooks size={20} className="flex-shrink-0" />
+                    <span>Bookings</span>
+                </NavItem>
 
-                {/* <SideUl> */}
-                    
-                    <SideLink isActive={matchServices} style={navLinkStyles} to="/dashboard/services">
-                        <FaHandsWash size={25}/>
-                        <p>Services</p>
-                    </SideLink>
-                {/* </SideUl> */}
+                <NavItem isActive={matchPrices} to="/dashboard/prices" style={navLinkStyles}>
+                    <ImPriceTags size={20} className="flex-shrink-0" />
+                    <span>Prices</span>
+                </NavItem>
 
-
-            </SideLinks>
-            {/* <button onClick={() => setDarkTheme(!darkTheme)}>Change Theme</button> */}
-  
-            {/* <NavLink to="/dashboard">Home</NavLink> */}
+                <NavItem isActive={matchServices} to="/dashboard/services" style={navLinkStyles}>
+                    <FaHandsWash size={20} className="flex-shrink-0" />
+                    <span>Services</span>
+                </NavItem>
+            </NavLinks>
         </Container>
     )
 }
 
-
-const primary =  "#34CCA1";
-const secondary = "#34CCA1";
-// const bg = "#F4F4F4";
-const borderRad = "5px";
-const yellowBtnHover = "#f7cb39";
-const gray = "#545454";
-
-
+// Styled Components
 const Container = styled.div`
-    flex: .22;
-    /* border: solid 1px red; */
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #34CCA1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 0;
+    z-index: 10;
+    transition: all 0.3s ease;
+
+    @media (max-width: 768px) {
+        transform: ${props => props.className === 'open' ? 'translateX(0)' : 'translateX(-100%)'};
+        width: 260px;
+    }
+`;
+
+const LogoSection = styled.div`
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1.5rem;
+`;
+
+const AdminProfile = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* padding: 1rem; */
-    border-right: solid 1px rgb(230, 230, 230);
-    /* border-right: ${(props) => (props.darkTheme ? "solid 1px rgb(230, 230, 230)" : "solid 1px rgb(230, 230, 230)")}; */
-    height: 100vh;
-    background: ${(props) => (props.darkTheme ? "#222222" : "#34CCA1")};
-    position: fixed;
-    width: 16%;
-    overflow-x: hidden;
-`
-
-const SideLink = styled(NavLink)`
-    color: ${props => (props.isActive ? props.darkTheme ?  "#fff" : "black" : "rgb(100, 100, 100)")};
-    color: ${props => (props.isActive ? props.darkTheme ?  "#fff" : secondary : props.darkTheme ?  "rgb(150, 150, 150)" : "rgb(190, 190, 190)")};
-    background: ${props => (props.isActive ? `#FCFCAC3b` : 'transparent')};
-    text-decoration: none;
-    position: relative;
-    letter-spacing: 1.6px;
-    font-size: 0.9rem;
-    padding: 0.5rem 1.2rem;
-    /* width: 100%; */
-    display: flex;
-    align-items: center;
-    /* margin-left: 0; */
-    gap: 0.5rem;
-    text-align: center;
-    /* font-weight: 600; */
-    /* border: solid 2px green; */
-    width: 100%;
-    border-radius: 10px;
+    padding: 0 1.5rem 1.5rem;
     margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
-
-    svg{
-        /* color: ${secondary}; */
-        /* color: ${props => (props.isActive ? secondary : "#796d45")}; */
-        /* color: ${props => (props.isActive ? props.darkTheme ?  "#fff" : secondary : props.darkTheme ?  "rgb(200, 200, 200)" : "#E9B6096b")}; */
+    img {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 0.75rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
     }
 
-    p{
+    h3 {
+        color: white;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    p {
+        color: rgba(255, 255, 255, 0.7);
         font-size: 0.8rem;
     }
-/* 
-
-  div{
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 300ms ease;
-  } */
-
-
-  &:hover {
-    div{
-        /* margin-left: calc(1rem - 3px); */
-        transition: all 300ms ease;
-    }
-  }
-
-
-  /* ${props =>
-    props.isActive &&
-    `
-
-  `} */
 `;
 
-const SideLinks = styled.div`
-    /* padding: 1rem; */
-    /* border: solid 2px rebeccapurple; */
-    text-align: center;
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* align-items: center; */
-    width: fit-content;
-    /* width: 70%; */
-`
-const SideUl = styled.div`
-    
-`
-
-const AdminProfile = styled.div`
-    /* border: solid 2px green; */
-    width: 100%;
-    text-align: center;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    display: none;
-
-    img{
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-    }
-
-    @media screen and (max-width: 990px) {
-        display: block;
-    }
-
-    p{
-        color: ${gray};
-    }
-`
-
-const Logo = styled.div`
-    flex: .3;
-    text-align: center;
-    /* font-family: sparkle; */
+const NavLinks = styled.nav`
     display: flex;
-    justify-content: center;
-    gap: 0.3rem;
-    font-size: 1.2rem;
+    flex-direction: column;
+    padding: 0 1rem;
+    flex-grow: 1;
+    overflow-y: auto;
+`;
+
+const NavItem = styled(NavLink)`
+    display: flex;
     align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
-    /* border: solid 2px red; */
-    background-color: ${primary};
-    width: 100%;
-    padding-bottom: 1rem;
-    padding-top: 0.5rem;
-
-    img{
-        width: 30px;
-        height: 30px;
-    }
-
-`
-
-const LogoLink = styled(Link)`
-    /* color: ${(props) => (props.active ? `${gray}` : `#fff`)}; */
-    color: ${gray};
-    color: ${props => (props.darkTheme ? "#fff" : "#fff")};
-    font-size: 1.2rem;
+    border-radius: 8px;
     text-decoration: none;
+    transition: all 0.2s ease;
+    color: ${props => props.style?.color || 'rgba(255, 255, 255, 0.8)'};
+    background: ${props => props.style?.backgroundColor || 'transparent'};
+    font-weight: ${props => props.style?.fontWeight || '400'};
 
-
-    span:first-child{
-        color: ${secondary};
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
     }
 
-    span:last-child{
-        color: ${secondary};
-        font-size: 2.5rem;
+    span {
+        font-size: 0.9rem;
+        white-space: nowrap;
     }
-`
+
+    svg {
+        flex-shrink: 0;
+    }
+`;

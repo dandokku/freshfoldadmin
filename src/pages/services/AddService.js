@@ -1,476 +1,296 @@
 import React from "react";
-import { useMutation, useQuery } from "react-query";
+import { useMutation } from "react-query";
 import styled from "styled-components";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import adminImage from "../assets/images/about2.jpg"
-
+import adminImage from "../assets/images/about2.jpg";
 
 export default function AddService() {
+  const admin = useSelector(state => state.admin);
+  const [fieldsData, setFieldsData] = React.useState({
+    serviceName: "",
+    description: "",
+  });
 
-    const admin = useSelector(state => state.admin);
+  const [validateFieldsData, setValidateFieldsData] = React.useState({
+    serviceName: "",
+    description: "",
+  });
 
-    const [fieldsData, setFieldsData] = React.useState({
-        serviceName: "",
-        description: "",
-   });
+  const [postResponse, setPostResponse] = React.useState("");
+  const [failResponse, setFailResponse] = React.useState("");
 
-    const [validateFieldsData, setValidateFieldsData] = React.useState({
-        serviceName: "",
-        description: "",
-    })
-
-    // console.log(fieldsData);
-
-    const [postResponse, setPostResponse] = React.useState("");
-    const [failResponse, setFailResponse] = React.useState("");
-
-    function handleSubmit(e) {
-        e.preventDefault();
-        if(!validateFieldsData.serviceName && !validateFieldsData.description){
-        }
-        else{
-            console.log("Failed");
-        }
-        
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validateFieldsData.serviceName && !validateFieldsData.description) {
+      mutate(fieldsData);
     }
+  };
 
-    // const [serviceImageData, setServiceImageData] = React.useState("");
-    // const [serviceIconData, setServiceIconData] = React.useState("");
+  const postService = async (service) => {
+    const response = await axios.post("http://localhost:9000/api/services", service);
+    return response.data;
+  };
 
-    // function handleImageChange(e) {
-    //     let reader = new FileReader();
-    //     reader.readAsDataURL(e.target.files[0]);
-    //     reader.onload = () => {
-    //         // console.log("reader: ", reader.result); // base64coded string
-    //         setServiceImageData(reader.result);
-    //     };
-    //     reader.onerror = error => {
-    //         console.log("Error", error);
-    //     }
-    // }
-
-    // function handleIconImageChange(e){
-    //     let reader = new FileReader();
-    //     reader.readAsDataURL(e.target.files[0]);
-    //     reader.onload = () => {
-    //         // console.log("reader: ", reader.result); // base64coded string
-    //         setServiceIconData(reader.result);
-    //     };
-    //     reader.onerror = error => {
-    //         console.log("Error", error);
-    //     }
-    // }
-
-    async function postPrices(service){
-        const response = await axios.post("http://localhost:9000/api/services", service);
-        return response.data;
-    }
-
-   const { mutate } = useMutation(postPrices,{
-    onSuccess: (data) => {
-        setPostResponse("Added Successfully.");
-        setFailResponse("");
+  const { mutate } = useMutation(postService, {
+    onSuccess: () => {
+      setPostResponse("Service added successfully");
+      setFailResponse("");
+      setFieldsData({ serviceName: "", description: "" });
     },
     onError: (err) => {
-        setPostResponse("");
-        setFailResponse(err.response.data);
+      setPostResponse("");
+      setFailResponse(err.response?.data || "Failed to add service");
     }
-   });
+  });
 
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    const validateFields = { ...validateFieldsData };
+    setPostResponse("");
 
-    
-    function handleInputChange(event){
-        const validateFields = {...validateFieldsData};
-        setPostResponse("");
+    setFieldsData(prev => ({
+      ...prev,
+      [name]: value
+    }));
 
-        setFieldsData(oldFieldsData => {
-            return {
-                ...oldFieldsData,
-                [event.target.name]: event.target.value
-            }
-        })
-
-        if (event.target.name === "name") {
-            // if(event.target.value.length > 30){
-                if (event.target.value.match(/[@#$!^%*0-9]/) || !event.target.value.trim()) {
-                    validateFields.name = "Item cannot contain numbers or special characters";
-                } 
-                else {
-                validateFields.name = "";
-                }
-            // }
-            // else{
-            //     validateFields.name = "";
-            // }
-            
-        }
-
-        if (event.target.name === "group") {
-            if (event.target.value.length > 30) {
-              validateFields.group = "Group cannot be more than 230 characters";
-            } 
-            else {
-              validateFields.group = "";
-            }
-        }
-
-        if(event.target.name === "price"){
-            if(event.target.value > 1000){
-                validateFields.price = 'Price cannot be more than $1000'
-            }
-
-            else{
-                validateFields.price = "";
-            }  
-        }
-
-        setValidateFieldsData(validateFields)
+    // Validation logic
+    if (name === "serviceName") {
+      if (/[@#$!^%*0-9]/.test(value) || !value.trim()) {
+        validateFields.serviceName = "Service name cannot contain numbers or special characters";
+      } else {
+        validateFields.serviceName = "";
+      }
     }
 
-    // console.log(validateFieldsData)
+    if (name === "description") {
+      if (value.length > 200) {
+        validateFields.description = "Description cannot exceed 200 characters";
+      } else {
+        validateFields.description = "";
+      }
+    }
 
-    return (
-        <Container>
-            <div>
-                <h3>Add Service</h3>
-                <div className="flex items-center gap-3">
-                  <img src={adminImage} className="w-[60px] h-[60px] rounded-[50%]"></img>
-                  <div>
-                    <h3 className="text-sm">{admin.firstName} {admin.lastName}</h3>
-                    <p>{admin.email}</p>
-                  </div>
-                </div>
+    setValidateFieldsData(validateFields);
+  };
 
-            </div>
-            <Form onSubmit={handleSubmit}>
+  return (
+    <DashboardContainer>
+      <DashboardHeader>
+        <h2>Add New Service</h2>
+        <AdminProfile>
+          <img src={adminImage} alt="Admin" />
+          <div>
+            <h3>{admin.firstName} {admin.lastName}</h3>
+            <p>{admin.email}</p>
+          </div>
+        </AdminProfile>
+      </DashboardHeader>
 
-                    {postResponse && <p className="add-successfull">{postResponse}</p>}
-                    {failResponse && <p className="add-failed">{failResponse}</p>}
-                    <div>
-                        <div className="user-info">
-                            <label>Service Name</label>
-                            <input required={true}
-                                type="text" max={200} className='input-field' name="serviceName" onChange={handleInputChange} 
-                            />
-                            {validateFieldsData.serviceName && validateFieldsData.serviceName}
-                        </div>
-                        <div className="user-info">
-                            <label>Service Description</label>
-                            <input required={true}
-                                    type="text" max={200} className='input-field' name="description" onChange={handleInputChange} 
-                            />
-                            {validateFieldsData.description && validateFieldsData.description}
-                        </div>
-                    </div>
+      <FormContainer>
+        <ServiceForm onSubmit={handleSubmit}>
+          {postResponse && <SuccessMessage>{postResponse}</SuccessMessage>}
+          {failResponse && <ErrorMessage>{failResponse}</ErrorMessage>}
 
-                    {/* <div>
-                        <div className="user-info">
-                            <label>Service Content</label>
-                            <input required={true}
-                                    type="text"
-                                    name="serviceContent"  min={1} max={200} className='input-field' 
-                                    onChange={handleInputChange}
-                            />
-                            {validateFieldsData.serviceContent && validateFieldsData.serviceContent}
-                        </div>
+          <FormGroup>
+            <Label htmlFor="serviceName">Service Name</Label>
+            <Input
+              id="serviceName"
+              name="serviceName"
+              type="text"
+              value={fieldsData.serviceName}
+              onChange={handleInputChange}
+              required
+            />
+            {validateFieldsData.serviceName && (
+              <ValidationError>{validateFieldsData.serviceName}</ValidationError>
+            )}
+          </FormGroup>
 
-                        <div className="user-info">
-                            <label>Service Image</label>
-                            <input required={true}
-                                type="file" className='input-field field-image' name="userImage" onChange={handleImageChange} accept="image/*"
-                            />
-                        </div>
-                    </div> */}
+          <FormGroup>
+            <Label htmlFor="description">Description</Label>
+            <TextArea
+              id="description"
+              name="description"
+              value={fieldsData.description}
+              onChange={handleInputChange}
+              rows="4"
+              required
+            />
+            {validateFieldsData.description && (
+              <ValidationError>{validateFieldsData.description}</ValidationError>
+            )}
+          </FormGroup>
 
-                    {/* <div>
-                        <div className="user-info">
-                            <label>Service Icon</label>
-                            <input required={true}
-                                type="file" className='input-field field-image' name="userImage" onChange={handleIconImageChange} accept="image/*"
-                            />
-                        </div>
-                    </div> */}
-
-                    <PricesDiv>
-                        <span className="btn-mask">Save</span>
-                        <button>Save</button>
-                    </PricesDiv>
-
-                </Form>
-        </Container>
-    )
+          <SubmitButton type="submit">
+            Save Service
+          </SubmitButton>
+        </ServiceForm>
+      </FormContainer>
+    </DashboardContainer>
+  );
 }
 
+// Styled Components
+const DashboardContainer = styled.div`
+  flex: 1;
+  padding: 2rem;
+  margin-left: 240px;
+  background: #f8f9fa;
+  min-height: 100vh;
 
-const primary =  "#34CCA1";
-const secondary = "#34CCA1";
-const bg = "#F4F4F4";
-const borderRad = "5px";
-const gray = "#04040A";
-const lightGray = "#7A8C87"
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding: 1rem;
+  }
+`;
 
-const Container = styled.div`
-    flex: 1;
-    // border: solid 2px red;
-    max-width: 100%;
-    overflow-x: hidden;
-    // display: flex;
-    // align-items: center;
-    background: hsl(237, 36%, 100%);
-    margin-left: 12rem;
+const DashboardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 
-    >div:first-child{
-        // margin-bottom: 2rem;
-        padding: 2.5rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+  h2 {
+    color: #343a40;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
 
-        
-
-        @media screen and (max-width: 990px) {
-            padding: 0.9rem 1.2rem;
-        }
-
-        h3{
-            color: ${secondary};
-            font-size: 1.7rem;
-        }
-    }
-
-    @media screen and (max-width: 990px) {
-        margin-left: 0;
-        padding: 1rem;
-        margin-top: 1rem;
-    }
-`
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+`;
 
 const AdminProfile = styled.div`
-    /* border: solid 2px green; */
-    text-align: center;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 
-    img{
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-    }
+  img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
 
-    p{
-        color: ${gray};
-    }
-
-    @media screen and (max-width: 990px) {
-        display: none;
-    }
-`
-
-const PricesDiv = styled.div`
-    width: 100%;
-    flex: .5;
-    padding: 2rem 0;
-    position: relative;
+  h3 {
     font-size: 1rem;
-    text-align: center;
+    color: #343a40;
+    margin-bottom: 0.25rem;
+  }
 
-    @media screen and (max-width: 500px) {
-        font-size: 0.9rem;
-    }
+  p {
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
 
-    .btn-mask{
-        border-radius: ${borderRad};
-        position: absolute;
-        color: ${secondary};
-        text-align: center;
-        position: absolute;
-        border: solid 2px ${secondary};
-        text-decoration: none;
-        padding: 15px 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 40%;
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
 
-        @media (max-width: 900px){
-            width: 100% !important;
-        }
-    }
+const FormContainer = styled.div`
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin: 0 auto;
+`;
 
-    button{
-        width: 40%;
-    position: relative;
-    text-decoration: none;
-    color: #fff;
-    background: ${secondary};
-    padding: 15px 20px;
-    -webkit-mask-size: 3000% 100%;
-    mask-size: 3000% 100%;
-    border: solid 2px ${secondary};
-    border-radius: ${borderRad};
-    cursor: pointer;
-    -webkit-animation: ani2 0.7s steps(29) forwards;
-    animation: ani2 0.7s steps(29) forwards;
-    font-size: 1rem;
-    font-family: poppins;
+const ServiceForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
 
-    @media (max-width: 900px){
-        width: 100% !important;
-    }
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
 
-    @media screen and (max-width: 500px) {
-        font-size: 0.9rem;
-    }
+const Label = styled.label`
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #343a40;
+`;
 
-    &:hover{
-        background-color: white;
-        color: ${secondary};
-    }
+const Input = styled.input`
+  padding: 0.75rem 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
 
+  &:focus {
+    outline: none;
+    border-color: #34CCA1;
+    box-shadow: 0 0 0 2px rgba(52, 204, 161, 0.2);
+  }
+`;
 
-   
-    @keyframes ani {
-        from{
-            -webkit-mask-position: 0 0;
-            mask-position: 0 0;
-        }
-        to{
-            -webkit-mask-position: 100% 0;
-            mask-position: 100% 0%;
-        }
-    }
+const TextArea = styled.textarea`
+  padding: 0.75rem 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s ease;
 
-    @keyframes ani2{
-        from{
-            -webkit-mask-position: 100% 0;
-            mask-position: 100% 0;
-        }
-        to{
-            -webkit-mask-position: 0 0;
-            mask-position: 0 0;
-        }
-    }
+  &:focus {
+    outline: none;
+    border-color: #34CCA1;
+    box-shadow: 0 0 0 2px rgba(52, 204, 161, 0.2);
+  }
+`;
 
-    
-    }
+const ValidationError = styled.span`
+  color: #dc3545;
+  font-size: 0.8rem;
+`;
 
+const SuccessMessage = styled.div`
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+`;
 
-    
-    @media (max-width: 568px) {
-        width: 100%;
-    }
-`
+const ErrorMessage = styled.div`
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+`;
 
+const SubmitButton = styled.button`
+  background: #34CCA1;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+  margin-top: 1rem;
 
-const Form = styled.form`
-    padding: 3rem 4rem;
+  &:hover {
+    background: #2bb38d;
+  }
 
-    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
-      -webkit-appearance: none; margin: 0; display: none;
-    }
-
-
-    .add-successfull{
-        color: green;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-
-    .add-failed{
-        color: red;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-
-    >div{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        
-
-        .user-info{
-            flex: .5;
-
-            label{
-                color: ${secondary};            
-            }
-
-            .input-field{
-                width: 100%;
-                position: relative;
-                /* padding: 0; */
-                margin: 0;
-                height: 50px;
-                border-radius: ${borderRad};
-                border: solid 1px #d3d3d3;
-                outline: none;
-                text-indent: 1rem;
-                font-size: 1rem;
-                margin-bottom: 1rem;
-                margin-top: 0.7rem;
-                content: "";
-
-            
-            
-                &:focus{
-                    border: solid 1px ${secondary};
-                    transition: all .2s ease-in-out;
-                }
-            }
-        }
-
-        .input-field::-webkit-file-upload-button{
-                background: ${primary};
-                height: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-                border: none;
-                outline: none;
-                color: #fff;
-                font-size: 0.8rem;
-                padding: 0 0.6rem;
-        }
-
-        .field-image{
-            text-align: start;
-            align-items: center;
-            display: flex;
-            padding-left: 6rem;
-
-        }
-
-        .user-info2{
-            flex: 1;
-
-
-
-            .input-field{
-                width: 100%;
-                position: relative;
-            padding: 0;
-            margin: 0;
-            height: 50px;
-            border-radius: ${borderRad};
-            border: solid 1px #d3d3d3;
-            outline: none;
-            text-indent: 1rem;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            margin-top: 0.7rem;
-            
-                &:focus{
-                    border: solid 1px ${secondary};
-                    transition: all .2s ease-in-out;
-                }
-            }
-        }
-
-        /* .user-info .2{
-            flex: 1;
-        } */
-        
-    }
-`
+  &:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+  }
+`;
