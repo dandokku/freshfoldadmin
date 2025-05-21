@@ -3,274 +3,337 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import axios from "axios";
-
+import { FiUser, FiCalendar, FiMail, FiPhone, FiHome, FiPackage, FiDollarSign } from 'react-icons/fi';
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function BookingDetails() {
-    const {bookingId} = useParams();
+    const { bookingId } = useParams();
     
-    async function getBooking(id){
+    async function getBooking(id) {
         const response = await axios.get(`http://localhost:9000/api/bookings/${id}`);
-        return response.data
+        return response.data;
     }
 
-    
-   function formatDate(date) {
-    if (!(date instanceof Date)) {
-      date = new Date(date);
+    function formatDate(dateString) {
+        if (!dateString) return "N/A";
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleDateString(undefined, options);
     }
-  
-    if (isNaN(date.getTime())) {
-      return "Invalid Date";
-    }
-  
-    const months = [
-      "January", "February", "March", "April", "May", "June", "July",
-      "August", "September", "October", "November", "December"
-    ];
-  
-    const day = date.getDate();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-  
-    const formatted = `${months[month]} ${day}, ${year}`;
-    return formatted;
-  }
 
-    const {data} = useQuery("booking", () => getBooking(bookingId));
-    // console.log(data);
+    const { data, isLoading, isError } = useQuery(["booking", bookingId], () => getBooking(bookingId));
+
+    if (isLoading) {
+        return (
+            <Container>
+                <LoadingSkeleton>
+                    <Skeleton height={40} width={200} style={{ marginBottom: '2rem' }} />
+                    <Skeleton height={20} count={4} style={{ marginBottom: '1rem' }} />
+                    <Skeleton height={40} width={200} style={{ marginBottom: '2rem', marginTop: '2rem' }} />
+                    <Skeleton height={20} count={3} style={{ marginBottom: '1rem' }} />
+                    <Skeleton height={40} width={200} style={{ marginBottom: '2rem', marginTop: '2rem' }} />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i}>
+                                <Skeleton height={20} width={150} style={{ marginBottom: '0.5rem' }} />
+                                <Skeleton height={16} count={4} />
+                            </div>
+                        ))}
+                    </div>
+                </LoadingSkeleton>
+            </Container>
+        );
+    }
+
+    if (isError) {
+        return (
+            <Container>
+                <ErrorMessage>
+                    Failed to load booking details. Please try again later.
+                </ErrorMessage>
+            </Container>
+        );
+    }
 
     return (
         <Container>
+            <Header>
+                <h1>Booking Details</h1>
+                <BookingId>ID: {bookingId}</BookingId>
+            </Header>
 
-            <div>
-                <h3>Bookings</h3>
-                <AdminProfile>
-                <img src={require("../pages/assets/images/bathmats-price.jpg")}></img>
-                <p>Owen Enabu</p>
-            </AdminProfile>
-            </div>
-            {/* {bookingId} */}
-            <main>
-                <UserDetails>
-                    <h2>User Details</h2>
-                    <div>
-                        <p><span>Full Name:</span> {data?.user.firstName} {data?.user.lastName}</p>
-                    </div>
-                    {/* <div> */}
-                        <p><span>Email:</span> {data?.user.email}</p>
-                        <p><span>Phone Number:</span> {data?.user.phoneNo}</p>
-                    {/* </div> */}
+            <ContentGrid>
+                <Section>
+                    <SectionTitle>
+                        <FiUser />
+                        <h2>Customer Information</h2>
+                    </SectionTitle>
+                    <InfoItem>
+                        <span>Full Name:</span>
+                        <p>{data?.user.firstName} {data?.user.lastName}</p>
+                    </InfoItem>
+                    <InfoItem>
+                        <span><FiMail /> Email:</span>
+                        <p>{data?.user.email}</p>
+                    </InfoItem>
+                    <InfoItem>
+                        <span><FiPhone /> Phone:</span>
+                        <p>{data?.user.phoneNo}</p>
+                    </InfoItem>
+                    <InfoItem>
+                        <span><FiHome /> Address:</span>
+                        <p>{data?.user.address}</p>
+                    </InfoItem>
+                </Section>
 
-                    <p><span>Address:</span> {data?.user.address}</p>
-                </UserDetails>
+                <Section>
+                    <SectionTitle>
+                        <FiCalendar />
+                        <h2>Schedule</h2>
+                    </SectionTitle>
+                    <InfoItem>
+                        <span>Booking Date:</span>
+                        <p>{formatDate(data?.bookingDate)}</p>
+                    </InfoItem>
+                    <InfoItem>
+                        <span>Pick Up Date:</span>
+                        <p>{formatDate(data?.pickUpDate)}</p>
+                    </InfoItem>
+                    <InfoItem>
+                        <span>Delivery Date:</span>
+                        <p>{formatDate(data?.deliveryDate)}</p>
+                    </InfoItem>
+                </Section>
+            </ContentGrid>
 
-                <Dates>
-                    <h2>Dates</h2>
-                    <p><span>Booking Date:</span> {formatDate(data?.bookingDate)}</p>
-                    <p><span>Pick Up Date:</span> {formatDate(data?.pickUpDate)}</p>
-                    <p><span>Delivery Date:</span> {formatDate(data?.deliveryDate)}</p>
-                </Dates>
-            </main>
-            
+            <Section>
+                <SectionTitle>
+                    <FiPackage />
+                    <h2>Order Items</h2>
+                </SectionTitle>
+                
+                <ItemsGrid>
+                    {data?.items.map((item, index) => (
+                        <ItemCard key={index}>
+                            <ItemName>{item.priceName}</ItemName>
+                            <ItemDetail>
+                                <span>ID:</span>
+                                <p>{item.id}</p>
+                            </ItemDetail>
+                            <ItemDetail>
+                                <span>Quantity:</span>
+                                <p>{item.quantity}</p>
+                            </ItemDetail>
+                            <ItemDetail>
+                                <span>Price:</span>
+                                <p><FiDollarSign />{item.price.toFixed(2)}</p>
+                            </ItemDetail>
+                            <ItemDetail>
+                                <span>Total:</span>
+                                <p><FiDollarSign />{item.totalUnitPrice.toFixed(2)}</p>
+                            </ItemDetail>
+                        </ItemCard>
+                    ))}
+                </ItemsGrid>
 
-            <Items>
-                <h2>Items</h2>
-                <div>
-                    {
-                        data?.items.map(item => {
-                            return <div style={{marginBottom: "1rem"}}>
-                                <h3 style={{color: gray}}>{item.label}</h3>
-                                <p><span>Id:</span> {item.priceId}</p>
-                                <p><span>Quantity:</span> {item.quantity}</p>
-                                {/* <p>{item._id}</p> */}
-                                <p><span>Price: </span>${item.price}</p>
-                                <p><span>Total:</span> ${item.totalUnitPrice}</p>
-                            </div>
-                        })
-                    }
-                </div>
-                <p><span>Items Total Price:</span> ${data?.itemsTotalPrice}</p>
-            </Items>
-
-            <WashPreference>
-                <h2>Wash Preference</h2>
-                <p><span>Bleach Whites:</span> {data?.washPreference.bleachWhites}</p>
-                <p><span>Preffered Detergent:</span> {data?.washPreference.prefferedDetergent}</p>
-                <p><span>Special Instructions:</span> {data?.washPreference.specialInstructions}</p>
-            </WashPreference>
-
+                <TotalPrice>
+                    <span>Order Total:</span>
+                    <p><FiDollarSign />{data?.itemsTotalPrice.toFixed(2)}</p>
+                </TotalPrice>
+            </Section>
         </Container>
-    )
+    );
 }
 
-
-const primary =  "#34347C";
-const secondary = "#E9B609";
-// const bg = "#F4F4F4";
-const borderRad = "5px";
-const yellowBtnHover = "#f7cb39";
-const gray = "#545454";
-
-
+// Styled Components
 const Container = styled.div`
-    flex: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+`;
+
+const LoadingSkeleton = styled.div`
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+`;
+
+const ErrorMessage = styled.div`
+    padding: 2rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 8px;
+    text-align: center;
+`;
+
+const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+        font-size: 1.75rem;
+        color: #1e293b;
+        font-weight: 700;
+    }
+`;
+
+const BookingId = styled.div`
+    font-size: 0.9rem;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+`;
+
+const ContentGrid = styled.div`
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    @media (min-width: 768px) {
+        grid-template-columns: 1fr 1fr;
+    }
+`;
+
+const Section = styled.section`
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+`;
+
+const SectionTitle = styled.div`
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    margin-left: 12rem;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: #334155;
 
-    >div:first-child{
-        // margin-bottom: 2rem;
-        padding: 2.5rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        
-
-        @media screen and (max-width: 990px) {
-            padding: 0.9rem 1.2rem;
-        }
-
-        h3{
-            color: ${secondary};
-            font-size: 1.7rem;
-        }
-    }
-
-    >div{
-    }
-
-    @media screen and (max-width: 990px) {
-        margin-left: 0;
-        /* padding: 1rem; */
-        margin-top: 1rem;
-    }
-
-    main{
-        display: flex;
-        width: 80%;
-        padding: 1rem;
-
-        div{
-            flex: .5;
-        }
-    }
-`
-
-const UserDetails = styled.div`
-        width: 80%;
-        flex: .5;
-    /* text-align: center; */
-
-    h2{
-        color: ${secondary};
-        margin-bottom: 1rem;
-    }
-
-    p{
-        margin-bottom: 0.8rem;
-        color: gray;
-    }
-
-    span{
-            color: ${gray};
-            font-weight: 600;
-        }
-`
-
-const Dates = styled.div`
-    width: 80%;
-    flex: .5;
-
-    h2{
-    color: ${secondary};
-    margin-bottom: 1rem;
-    }
-
-    p{
-        margin-bottom: 0.8rem;
-        color: gray;
-    }
-
-    span{
-        color: ${gray};
+    h2 {
+        font-size: 1.25rem;
         font-weight: 600;
     }
-`
 
-const Items = styled.div`
-        width: 80%;
-        margin: 0 auto;
-        /* border: solid 2px green; */
-        padding: 1rem;
-
-        >div{
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: repeat(3, 1fr);
-
-            h3{
-                margin-bottom: 0.7rem;
-            }
-        }
-        
-    
-    h2{
-        color: ${secondary};
-        margin-bottom: 1rem;
+    svg {
+        font-size: 1.5rem;
+        color: #34CCA1;
     }
+`;
 
-    p{
-        margin-bottom: 0.8rem;
-        color: gray;
-    }
-
-    span{
-            color: ${gray};
-            font-weight: 600;
-        }
-`
-
-const WashPreference = styled.div`
-        width: 80%;
-        padding: 1rem;
-    
-    h2{
-        color: ${secondary};
-        margin-bottom: 1rem;
-    }
-
-    p{
-        margin-bottom: 0.8rem;
-        color: gray;
-    }
-
-    span{
-            color: ${gray};
-            font-weight: 600;
-        }
-`
-
-const AdminProfile = styled.div`
-    /* border: solid 2px green; */
-    text-align: center;
+const InfoItem = styled.div`
     display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
 
-    img{
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+    span {
+        font-weight: 600;
+        color: #475569;
+        min-width: 120px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    p{
-        color: ${gray};
+    p {
+        color: #64748b;
+        flex: 1;
     }
 
-    @media screen and (max-width: 990px) {
-        display: none;
+    svg {
+        font-size: 1rem;
+        color: #94a3b8;
     }
-`
+`;
+
+const ItemsGrid = styled.div`
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+`;
+
+const ItemCard = styled.div`
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: #34CCA1;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+`;
+
+const ItemName = styled.h3`
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+`;
+
+const ItemDetail = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+
+    span {
+        color: #475569;
+        font-weight: 500;
+    }
+
+    p {
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    svg {
+        font-size: 0.8rem;
+        color: #34CCA1;
+    }
+`;
+
+const TotalPrice = styled.div`
+    display: flex;
+    justify-content: space-between;
+    padding: 1.25rem;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+
+    span {
+        color: #475569;
+    }
+
+    p {
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    svg {
+        color: #34CCA1;
+    }
+`;
