@@ -121,7 +121,7 @@ import adminImage from "../pages/assets/images/about2.jpg"
 export default function Users() {
 
     async function getUser(){
-        const response = await axios.get("http://localhost:9000/api/users");
+        const response = await axios.get("https://freshfoldserver.onrender.com/api/users");
         return response.data
    }
 

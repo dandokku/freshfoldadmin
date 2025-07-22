@@ -23,22 +23,22 @@ export default function Dashboard() {
 
   // API Fetch Functions
   async function getBookings() {
-    const response = await axios.get("http://localhost:9000/api/bookings");
+    const response = await axios.get("https://freshfoldserver.onrender.com/api/bookings");
     return response.data;
   }
 
   async function getLatestBookings() {
-    const response = await axios.get("http://localhost:9000/api/bookings/recentBookings");
+    const response = await axios.get("https://freshfoldserver.onrender.com/api/bookings/recentBookings");
     return response.data;
   }
 
   async function getUser() {
-    const response = await axios.get("http://localhost:9000/api/users");
+    const response = await axios.get("https://freshfoldserver.onrender.com/api/users");
     return response.data;
   }
 
   async function getRecentUsers() {
-    const response = await axios.get("http://localhost:9000/api/users/recentUsers");
+    const response = await axios.get("https://freshfoldserver.onrender.com/api/users/recentUsers");
     return response.data;
   }
 

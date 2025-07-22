@@ -19,7 +19,7 @@ export default function UserActions1({
 
   async function updateService(price) {
     const response = await axios.put(
-      `http://localhost:9000/api/services/${rowId}`,
+      `https://freshfoldserver.onrender.com/api/services/${rowId}`,
       price
     );
     return response.data;

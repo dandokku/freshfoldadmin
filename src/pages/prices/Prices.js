@@ -18,7 +18,7 @@ import adminImage from "../assets/images/about2.jpg"
 export default function Prices() {
 
     async function getPrices(){
-        const response = await axios.get("http://localhost:9000/api/prices");
+        const response = await axios.get("https://freshfoldserver.onrender.com/api/prices");
         return response.data
    }
 
@@ -80,7 +80,7 @@ export default function Prices() {
 
 
    async function deletePrice(){
-    const response = await axios.delete(`http://localhost:9000/api/prices/${deleteRowId}`);
+    const response = await axios.delete(`https://freshfoldserver.onrender.com/api/prices/${deleteRowId}`);
     return response.data;
     }
 

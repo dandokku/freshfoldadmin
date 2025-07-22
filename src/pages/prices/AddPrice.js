@@ -30,7 +30,7 @@ export default function AddPrice() {
   };
 
   const postPrice = async (price) => {
-    const response = await axios.post("http://localhost:9000/api/prices", price);
+    const response = await axios.post("https://freshfoldserver.onrender.com/api/prices", price);
     return response.data;
   };
 

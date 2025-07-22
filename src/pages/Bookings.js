@@ -19,7 +19,7 @@ export default function Bookings() {
 
 
     async function getUser(){
-        const response = await axios.get("http://localhost:9000/api/bookings");
+        const response = await axios.get("https://freshfoldserver.onrender.com/api/bookings");
         return response.data
    }
 

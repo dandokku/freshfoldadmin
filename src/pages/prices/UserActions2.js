@@ -13,7 +13,7 @@ export default function UserActions2({params, rowId, setRowId}) {
 
 
     async function updatePrice(price) {
-        const response = await axios.put(`http://localhost:9000/api/prices/${rowId}`, price);
+        const response = await axios.put(`https://freshfoldserver.onrender.com/api/prices/${rowId}`, price);
         return response.data
     }
 

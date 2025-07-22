@@ -21,14 +21,14 @@ export default function Services() {
 
   // Fetch services data
   const { data: servicesData, isLoading } = useQuery("services", async () => {
-    const response = await axios.get("http://localhost:9000/api/services");
+    const response = await axios.get("https://freshfoldserver.onrender.com/api/services");
     return response.data;
   });
 
   // Delete service mutation
   const { mutate: deleteMutate } = useMutation(
     async () => {
-      const response = await axios.delete(`http://localhost:9000/api/services/${deleteRowId}`);
+      const response = await axios.delete(`https://freshfoldserver.onrender.com/api/services/${deleteRowId}`);
       return response.data;
     },
     {

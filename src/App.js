@@ -51,7 +51,7 @@ function App() {
         'x-auth-admin-token': token
       }
     };
-    const response = await axios.get("http://localhost:9000/api/admins/me", config);
+    const response = await axios.get("https://freshfoldserver.onrender.com/api/admins/me", config);
     return response.data;
   }
 

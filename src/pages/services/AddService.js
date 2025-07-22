@@ -28,7 +28,7 @@ export default function AddService() {
   };
 
   const postService = async (service) => {
-    const response = await axios.post("http://localhost:9000/api/services", service);
+    const response = await axios.post("https://freshfoldserver.onrender.com/api/services", service);
     return response.data;
   };
 

@@ -12,7 +12,7 @@ export default function BookingStatus({params, rowId, setRowId}) {
 
 
     async function updateStatus(status) {
-        const response = await axios.put(`http://localhost:9000/api/bookings/${rowId}`, status);
+        const response = await axios.put(`https://freshfoldserver.onrender.com/api/bookings/${rowId}`, status);
         return response.data
     }
 

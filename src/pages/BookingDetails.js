@@ -11,7 +11,7 @@ export default function BookingDetails() {
     const { bookingId } = useParams();
     
     async function getBooking(id) {
-        const response = await axios.get(`http://localhost:9000/api/bookings/${id}`);
+        const response = await axios.get(`https://freshfoldserver.onrender.com/api/bookings/${id}`);
         return response.data;
     }
 

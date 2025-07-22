@@ -96,7 +96,7 @@ const MyChart = ({ chartData }) => {
 export default function RevenueChart() {
 
     async function getBookings(){
-        const response = await axios.get("http://localhost:9000/api/bookings");
+        const response = await axios.get("https://freshfoldserver.onrender.com/api/bookings");
         return response.data
     }
 

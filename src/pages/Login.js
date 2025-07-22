@@ -17,7 +17,7 @@ function AdminLogin() {
   async function postUser() {
     setIsLoading(true);
     try {
-      const response = await axios.post("http://localhost:9000/api/admin-auth", fieldsData);
+      const response = await axios.post("https://freshfoldserver.onrender.com/api/admin-auth", fieldsData);
 
       const authToken = response.headers["x-auth-admin-token"];
       localStorage.setItem("admin-jwt", JSON.stringify(authToken));
